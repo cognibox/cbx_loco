@@ -213,7 +213,8 @@ module CbxLoco
       file_path = CbxLoco.file_path path, ".keep"
       f = File.new file_path, "w:UTF-8"
       f.close
-      print "Done!".colorize(:green)
+
+      puts "Done!".colorize(:green)
     end
 
     def self.print_error(message)
