@@ -299,19 +299,24 @@ describe CbxLoco::LocoAdapter do
 
     context "when locale folder does not exist" do
       let!(:mock_file) { double }
+      let(:folder_to_create) { "./locale/en" }
+      let(:keep_file) { File.join(folder_to_create, ".keep") }
+
       before do
         allow(File).to receive(:directory?).and_return(true)
-        allow(File).to receive(:new).and_call_original
+        allow(File).to receive(:directory?).with(folder_to_create).and_return(false)
+        allow(FileUtils).to receive(:mkdir_p).with(folder_to_create)
+        allow(FileUtils).to receive(:touch)
       end
 
       it "should create the folder" do
-        not_exist_folder = "./locale/en"
-        allow(File).to receive(:directory?).with(not_exist_folder).and_return(false)
-        allow(FileUtils).to receive(:mkdir_p).with(not_exist_folder)
-
         CbxLoco::LocoAdapter.import
+        expect(FileUtils).to have_received(:mkdir_p).with(folder_to_create)
+      end
 
-        expect(FileUtils).to have_received(:mkdir_p).with(not_exist_folder)
+      it "should create .keep file" do
+        CbxLoco::LocoAdapter.import
+        expect(FileUtils).to have_received(:touch).with(keep_file)
       end
     end
 
