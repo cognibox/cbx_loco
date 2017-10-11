@@ -166,7 +166,6 @@ module CbxLoco
             api_ext = fmt[:api_ext]
             tag = CbxLoco.asset_tag i18n_file[:id], i18n_file[:name]
 
-            print "Importing \"#{language}\" #{tag} assets... "
 
             api_params = { filter: tag, order: :id }
             case i18n_file[:format]
@@ -180,6 +179,10 @@ module CbxLoco
 
             translations = get "export/locale/#{language}.#{api_ext}", api_params, false
 
+            dirname = File.dirname(file_path)
+            create_directory(dirname) unless File.directory?(dirname)
+
+            print "Importing \"#{language}\" #{tag} assets... "
             f = File.new file_path, "w:UTF-8"
             f.write translations.force_encoding("UTF-8")
             f.close
@@ -203,9 +206,20 @@ module CbxLoco
 
     private
 
+    def self.create_directory(path)
+      print "Creating \"#{path}\" folder..."
+
+      FileUtils.mkdir_p(path)
+      file_path = CbxLoco.file_path path, ".keep"
+      f = File.new file_path, "w:UTF-8"
+      f.close
+      print "Done!".colorize(:green)
+    end
+
     def self.print_error(message)
       puts "\n\n" + message.colorize(:red).bold
     end
+
 
     def self.run_event(event_name)
       CbxLoco.configuration.tasks.with_indifferent_access
