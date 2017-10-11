@@ -207,7 +207,7 @@ module CbxLoco
     private
 
     def self.create_directory(path)
-      print "Creating \"#{path}\" folder..."
+      print "Creating \"#{path}\" folder... "
 
       FileUtils.mkdir_p(path)
       file_path = CbxLoco.file_path path, ".keep"
