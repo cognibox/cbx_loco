@@ -19,24 +19,6 @@ describe CbxLoco::LocoAdapter do
       f = File.new file_path, "w:UTF-8"
       f.write @fake_translations[i18n_file[:id]].force_encoding("UTF-8")
       f.close
-
-      # create dst dir
-      @fake_languages.each do |language|
-        case i18n_file[:format]
-        when :gettext
-          file_path = CbxLoco.file_path fmt[:path], language, [i18n_file[:name], fmt[:dst_ext]].join(".")
-        when :yaml
-          file_path = CbxLoco.file_path fmt[:path], [i18n_file[:name], language, fmt[:dst_ext]].join(".")
-        end
-
-        dirname = File.dirname(file_path)
-        unless File.directory?(dirname)
-          FileUtils.mkdir_p(dirname)
-          file_path = CbxLoco.file_path dirname, ".keep"
-          f = File.new file_path, "w:UTF-8"
-          f.close
-        end
-      end
     end
   end
 
@@ -313,6 +295,29 @@ describe CbxLoco::LocoAdapter do
       end
 
       CbxLoco::LocoAdapter.import
+    end
+
+    context "when locale folder does not exist" do
+      let!(:mock_file) { double }
+      let(:folder_to_create) { "./locale/en" }
+      let(:keep_file) { File.join(folder_to_create, ".keep") }
+
+      before do
+        allow(File).to receive(:directory?).and_return(true)
+        allow(File).to receive(:directory?).with(folder_to_create).and_return(false)
+        allow(FileUtils).to receive(:mkdir_p).with(folder_to_create)
+        allow(FileUtils).to receive(:touch)
+      end
+
+      it "should create the folder" do
+        CbxLoco::LocoAdapter.import
+        expect(FileUtils).to have_received(:mkdir_p).with(folder_to_create)
+      end
+
+      it "should create .keep file" do
+        CbxLoco::LocoAdapter.import
+        expect(FileUtils).to have_received(:touch).with(keep_file)
+      end
     end
 
     it "should write API return in language files" do
