@@ -1,6 +1,5 @@
 require "cbx_loco"
 require "rspec"
-require "byebug"
 
 RSpec.configure do |config|
 end
