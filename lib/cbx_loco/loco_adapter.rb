@@ -116,7 +116,8 @@ module CbxLoco
         puts "Done!".colorize(:green)
 
         @assets.each do |asset_name, asset|
-          existing_asset = existing_assets[asset_name]
+          trimmed_asset_name = asset_name.length > 100 ? asset_name[0..96] + "..." : asset_name
+          existing_asset = existing_assets[trimmed_asset_name] || existing_assets[asset_name]
 
           if existing_asset.nil?
             print_asset_name = asset_name.length > 50 ? asset_name[0..46] + "[...]" : asset_name
@@ -133,7 +134,7 @@ module CbxLoco
             end
 
             existing_asset = { id: res["id"], tags: res["tags"] }
-            existing_assets[asset_name] = existing_asset
+            existing_assets[trimmed_asset_name] = existing_asset
             puts "Done!".colorize(:green)
           end
 
