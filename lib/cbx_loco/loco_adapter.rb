@@ -40,7 +40,11 @@ module CbxLoco
 
     def self.valid_api_key?
       valid = CbxLoco.configuration.api_key.present?
-      puts "MISSING I18N API KEY. ABORTING.".colorize(:red).bold unless valid
+      unless valid
+        puts "MISSING I18N API KEY. ABORTING.".colorize(:red).bold
+        exit(1)
+      end
+
       valid
     end
 
@@ -186,6 +190,13 @@ module CbxLoco
             f = File.new file_path, "w:UTF-8"
             f.write translations.force_encoding("UTF-8")
             f.close
+
+            begin
+              YAML.load_file(file_path)
+            rescue Exception
+              puts "\n\nFILE ERROR: \"#{language}\" #{tag} is not YAML or is invalid:\n#{$!}\n\n"
+              exit(1)
+            end
 
             puts "Done!".colorize(:green)
           end
