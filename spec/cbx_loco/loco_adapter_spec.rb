@@ -322,7 +322,7 @@ describe CbxLoco::LocoAdapter do
     end
 
     context "when file is not valid YAML" do
-      it "should exit" do
+      it "should exit with error" do
         allow(YAML).to receive(:load_file).and_raise
         expect { CbxLoco::LocoAdapter.import }.to raise_error(SystemExit)
       end
