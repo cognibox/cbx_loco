@@ -90,7 +90,7 @@ describe CbxLoco::LocoAdapter do
     ]
     @pot_header = "msgid \"\"\nmsgstr \"\"\n\"Content-Type: text/plain; charset=UTF-8\\n\"\n\"Content-Transfer-Encoding: 8bit\\n\"\n\n"
     @fake_translations = {
-      "test_server" => "en:\n  cbx:\n    some_asset:\n    some_other_asset:",
+      "test_server" => "en:\n  cbx:\n    some_asset:\n    some_other_asset:\n    some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_because_we_want_everything_to_work_properly:",
       "test_client" => @pot_header + "msgid \"Some asset\"\nmsgstr \"\"\n\nmsgid \"Some other asset\"\nmsgstr \"\"\n"
     }
     @fake_api_key = "abcd1234"
@@ -203,6 +203,7 @@ describe CbxLoco::LocoAdapter do
     before(:each) do
       get_response = [
         { "id" => "cbx.some_other_asset", "name" => "cbx.some_other_asset", "tags" => ["testserver-testcbx"] },
+        { "id" => "cbx.some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_because_we_want_everything_to_work_properly", "name" => "cbx.some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_beca...", "tags" => ["testserver-testcbx"] },
         { "id" => "some-other-asset", "name" => "Some other asset", "tags" => ["testclient-testfrontend"] }
       ]
       allow(CbxLoco::LocoAdapter).to receive(:get).and_return(get_response)
@@ -230,6 +231,7 @@ describe CbxLoco::LocoAdapter do
         "Some asset" => { tags: %w[testclient-testfrontend] },
         "Some other asset" => { tags: %w[testclient-testfrontend] },
         "cbx.some_asset" => { tags: %w[testserver-testcbx testserver-testdevise], id: "cbx.some_asset" },
+        "cbx.some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_because_we_want_everything_to_work_properly" => { tags: %w[testserver-testcbx testserver-testdevise], id: "cbx.some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_because_we_want_everything_to_work_properly" },
         "cbx.some_other_asset" => { tags: %w[testserver-testcbx testserver-testdevise], id: "cbx.some_other_asset" }
       }
       CbxLoco::LocoAdapter.extract
@@ -248,7 +250,7 @@ describe CbxLoco::LocoAdapter do
 
     it "should upload non-existing asset tags to Loco" do
       CbxLoco::LocoAdapter.extract
-      expect(CbxLoco::LocoAdapter).to have_received(:post).with(%r[assets/.*/tags\.json], anything).exactly(4).times
+      expect(CbxLoco::LocoAdapter).to have_received(:post).with(%r[assets/.*/tags\.json], anything).exactly(5).times
     end
 
     context "with missing API_KEY" do
