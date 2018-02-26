@@ -7,19 +7,23 @@ describe CbxLoco::LocoAdapter do
 
   def create_files
     @fake_i18n_files.each do |i18n_file|
-      fmt = @fake_file_formats[i18n_file[:format]]
-      case i18n_file[:format]
-      when :gettext
-        file_path = CbxLoco.file_path fmt[:path], [i18n_file[:name], fmt[:src_ext]].join(".")
-      when :yaml
-        language = @fake_languages.first
-        file_path = CbxLoco.file_path fmt[:path], [i18n_file[:name], language, fmt[:src_ext]].join(".")
-      end
-
-      f = File.new file_path, "w:UTF-8"
-      f.write @fake_translations[i18n_file[:id]].force_encoding("UTF-8")
-      f.close
+      create_file i18n_file
     end
+  end
+
+  def create_file(i18n_file)
+    fmt = @fake_file_formats[i18n_file[:format]]
+    case i18n_file[:format]
+    when :gettext
+      file_path = CbxLoco.file_path fmt[:path], [i18n_file[:name], fmt[:src_ext]].join(".")
+    when :yaml
+      language = @fake_languages.first
+      file_path = CbxLoco.file_path fmt[:path], [i18n_file[:name], language, fmt[:src_ext]].join(".")
+    end
+
+    f = File.new file_path, "w:UTF-8"
+    f.write @fake_translations[i18n_file[:id]].force_encoding("UTF-8")
+    f.close
   end
 
   def delete_files
@@ -251,14 +255,11 @@ describe CbxLoco::LocoAdapter do
 
     context "with missing API_KEY" do
       before(:each) do
-        stub_const("CbxLoco::LocoAdapter::API_KEY", nil)
+        CbxLoco.configuration.api_key = nil
       end
 
-      it "should not do anything" do
-        expect(CbxLoco::LocoAdapter).to_not have_received(:get)
-        expect(CbxLoco::LocoAdapter).to_not have_received(:post)
-        expect(CbxLoco::LocoAdapter).to_not have_received(:`)
-        expect(File).to_not have_received(:unlink)
+      it "should exit with error" do
+        expect { CbxLoco::LocoAdapter.extract }.to raise_error(SystemExit)
       end
     end
   end
@@ -322,6 +323,13 @@ describe CbxLoco::LocoAdapter do
       end
     end
 
+    context "when file is not valid YAML" do
+      it "should exit with error" do
+        allow(YAML).to receive(:load_file).and_raise
+        expect { CbxLoco::LocoAdapter.import }.to raise_error(SystemExit)
+      end
+    end
+
     it "should write API return in language files" do
       CbxLoco::LocoAdapter.import
 
@@ -346,12 +354,11 @@ describe CbxLoco::LocoAdapter do
 
     context "with missing API_KEY" do
       before(:each) do
-        stub_const("CbxLoco::LocoAdapter::API_KEY", nil)
+        CbxLoco.configuration.api_key = nil
       end
 
-      it "should not do anything" do
-        expect(CbxLoco::LocoAdapter).to_not have_received(:get)
-        expect(CbxLoco::LocoAdapter).to_not have_received(:`)
+      it "should exit with error" do
+        expect { CbxLoco::LocoAdapter.import }.to raise_error(SystemExit)
       end
     end
   end
