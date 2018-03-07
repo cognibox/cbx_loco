@@ -192,11 +192,13 @@ module CbxLoco
             f.write translations.force_encoding("UTF-8")
             f.close
 
-            begin
-              YAML.load_file(file_path)
-            rescue Exception
-              puts "\n\nFILE ERROR: \"#{language}\" #{tag} is not YAML or is invalid:\n#{$!}\n\n"
-              exit(1)
+            if i18n_file[:format] == :yaml
+              begin
+                YAML.load_file(file_path)
+              rescue Exception
+                puts "\n\nFILE ERROR: \"#{language}\" #{tag} is not YAML or is invalid:\n#{$!}\n\n"
+                exit(1)
+              end
             end
 
             puts "Done!".colorize(:green)

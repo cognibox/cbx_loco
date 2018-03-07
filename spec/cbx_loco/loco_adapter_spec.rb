@@ -323,6 +323,19 @@ describe CbxLoco::LocoAdapter do
       end
     end
 
+    it "should only validate YAML file" do
+      allow(YAML).to receive(:load_file)
+      CbxLoco::LocoAdapter.import
+      @fake_i18n_files.each do |file|
+        case file[:format]
+        when :gettext
+          expect(YAML).to_not have_received(:load_file).with(/#{file[:name]}/)
+        when :yaml
+          expect(YAML).to have_received(:load_file).with(/#{file[:name]}/).exactly(2).times
+        end
+      end
+    end
+
     context "when file is not valid YAML" do
       it "should exit with error" do
         allow(YAML).to receive(:load_file).and_raise
