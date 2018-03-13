@@ -31,9 +31,9 @@ TEXT
   # Allow colors in console outputs
   s.add_dependency "colorize", "~> 0.8.1"
 
-  s.add_dependency "rails", ">= 3.2"
+  s.add_dependency "rails", ">= 4.1", "<= 5.1"
   s.add_dependency "rest-client", "~> 1.6.7"
+  s.add_dependency "rake", ">= 11.0", "<= 12.0"
 
-  s.add_development_dependency "rake", "~> 10.0"
-  s.add_development_dependency "rspec", ">= 3"
+  s.add_development_dependency "rspec", "~> 3.6"
 end
