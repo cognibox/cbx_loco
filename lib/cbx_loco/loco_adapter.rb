@@ -27,6 +27,7 @@ module CbxLoco
   class LocoAdapter
     def self.get(api_path, params = {}, json = true)
       params = params.merge(key: CbxLoco.configuration.api_key, ts: Time.now.getutc)
+      params = params.merge(v: CbxLoco.configuration.version) if CbxLoco.configuration.version
       res = RestClient.get CbxLoco.configuration.api_url + api_path, params: params
 
       json ? JSON.parse(res.body) : res.body
@@ -112,11 +113,10 @@ module CbxLoco
       begin
         print "Grabbing the list of existing assets... "
         res = get "assets.json"
-        existing_assets = {}
-        res.each do |asset|
-          existing_assets[asset["name"]] = { id: asset["id"], tags: asset["tags"] }
-        end
+
+        existing_assets = CbxLoco.extractAdapter.new(res).grab_existing_assets
         res = nil
+
         puts "Done!".colorize(:green)
 
         @assets.each do |asset_name, asset|

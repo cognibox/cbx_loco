@@ -2,6 +2,7 @@ require 'active_support'
 require 'active_support/core_ext'
 require "cbx_loco/version"
 require 'cbx_loco/configuration'
+require 'cbx_loco/extract_adapter'
 require 'cbx_loco/loco_adapter'
 
 module CbxLoco
