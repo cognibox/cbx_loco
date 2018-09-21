@@ -93,6 +93,7 @@ describe CbxLoco::LocoAdapter do
       "test_server" => "en:\n  cbx:\n    some_asset:\n    some_other_asset:\n    some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_because_we_want_everything_to_work_properly:",
       "test_client" => @pot_header + "msgid \"Some asset\"\nmsgstr \"\"\n\nmsgid \"Some other asset\"\nmsgstr \"\"\n"
     }
+
     @fake_api_key = "abcd1234"
     @fake_api_url = "http://example.com/api/"
     @fake_languages = %w[en fr]
@@ -140,13 +141,39 @@ describe CbxLoco::LocoAdapter do
       expect(RestClient).to have_received(:get).with("#{@fake_api_url}#{random_str}", anything)
     end
 
+    context "when api version" do
+      it "should send it to get" do
+        cur_datetime = Time.parse "2016-12-25"
+        allow(Time).to receive(:now).and_return(cur_datetime)
+        CbxLoco.configuration.version = "1.0.0"
+        CbxLoco::LocoAdapter.get("test")
+        get_params = { key: @fake_api_key, ts: cur_datetime }
+        get_params[:v] = CbxLoco.configuration.version
+        expect(RestClient).to have_received(:get).with(anything, params: get_params)
+      end
+    end
+
+    context "when no api version" do
+      it "should not send version" do
+        cur_datetime = Time.parse "2016-12-25"
+        allow(Time).to receive(:now).and_return(cur_datetime)
+        CbxLoco.configuration.version = nil
+        CbxLoco::LocoAdapter.get("test")
+        get_params = { key: @fake_api_key, ts: cur_datetime }
+        # get_params[:v] = CbxLoco.configuration.version
+        expect(RestClient).to have_received(:get).with(anything, params: get_params)
+      end
+    end
+
     it "should build the request parameters" do
       cur_datetime = Time.parse "2016-12-25"
       allow(Time).to receive(:now).and_return(cur_datetime)
       random_sym = rand_str.to_sym
       random_str = rand_str
       CbxLoco::LocoAdapter.get("test", random_sym => random_str)
-      expect(RestClient).to have_received(:get).with(anything, params: { key: @fake_api_key, random_sym => random_str, ts: cur_datetime })
+      get_params = { key: @fake_api_key, ts: cur_datetime, random_sym => random_str }
+      get_params[:v] = CbxLoco.configuration.version if CbxLoco.configuration.version.present?
+      expect(RestClient).to have_received(:get).with(anything, params: get_params)
     end
 
     it "should prevent overriding the API key" do
@@ -154,7 +181,9 @@ describe CbxLoco::LocoAdapter do
       allow(Time).to receive(:now).and_return(cur_datetime)
       random_str = rand_str
       CbxLoco::LocoAdapter.get("test", key: random_str)
-      expect(RestClient).to have_received(:get).with(anything, params: { key: @fake_api_key, ts: cur_datetime })
+      get_params = { key: @fake_api_key, ts: cur_datetime }
+      get_params[:v] = CbxLoco.configuration.version if CbxLoco.configuration.version.present?
+      expect(RestClient).to have_received(:get).with(anything, params: get_params)
     end
 
     context "with json undefined or true" do
@@ -201,6 +230,8 @@ describe CbxLoco::LocoAdapter do
     end
 
     before(:each) do
+      CbxLoco.configuration.version = "1.0.19"
+
       get_response = [
         { "id" => "cbx.some_other_asset", "name" => "cbx.some_other_asset", "tags" => ["testserver-testcbx"] },
         { "id" => "cbx.some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_because_we_want_everything_to_work_properly", "name" => "cbx.some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_beca...", "tags" => ["testserver-testcbx"] },

@@ -114,7 +114,7 @@ module CbxLoco
         print "Grabbing the list of existing assets... "
         res = get "assets.json"
 
-        existing_assets = CbxLoco.extractAdapter.new(res).grab_existing_assets
+        existing_assets = CbxLoco::ExtractAdapter.new(res).grab_existing_assets
         res = nil
 
         puts "Done!".colorize(:green)
