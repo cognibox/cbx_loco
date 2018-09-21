@@ -160,7 +160,6 @@ describe CbxLoco::LocoAdapter do
         CbxLoco.configuration.version = nil
         CbxLoco::LocoAdapter.get("test")
         get_params = { key: @fake_api_key, ts: cur_datetime }
-        # get_params[:v] = CbxLoco.configuration.version
         expect(RestClient).to have_received(:get).with(anything, params: get_params)
       end
     end
