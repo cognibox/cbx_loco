@@ -1,0 +1,124 @@
+require 'rest-client'
+require 'time'
+require 'json'
+require 'yaml'
+require 'colorize'
+require 'get_pomo'
+require 'fileutils'
+
+require 'cbx_loco/extention'
+require 'cbx_loco/extention/yaml'
+require 'cbx_loco/extention/json'
+require 'cbx_loco/extention/gettext'
+
+
+class CbxLoco::Importer
+    def run
+      puts "\n" + "Import i18n assets from Loco".colorize(:green).bold
+
+      begin
+        CbxLoco.configuration.i18n_files.each do |i18n_file, key|
+
+          # https://localise.biz/api/export/archive/{ext}.zip
+          next unless i18n_file[:format] == :gettext
+
+          fmt = CbxLoco.configuration.file_formats[i18n_file[:format]]
+          api_ext = fmt[:api_ext]
+          tag = CbxLoco.asset_tag i18n_file[:id], i18n_file[:name]
+          api_params = { filter: tag, order: :id, format: fmt[:format] }
+
+          if (fmt[:import_params].is_a?(Hash))
+            api_params = api_params.merge(fmt[:import_params])
+          end
+
+          # translations = CbxLoco::Adapter.get "export/all.#{api_ext}", api_params, false
+          extention_class = "CbxLoco::Extention::#{i18n_file[:format].to_s.camelize}".constantize
+          # translations = extention_class.get_all
+
+          translations = nil;
+          save_file_params = {
+            extention_class: extention_class,
+            fmt: fmt,
+            i18n_file: i18n_file,
+            tag: tag,
+            language: nil,
+            translations: translations
+          }
+
+          input = CbxLoco::Adapter.get "export/archive/#{api_ext}.zip", api_params, false
+          Zip::InputStream.open(StringIO.new(input)) do |io|
+            while entry = io.get_next_entry
+              puts entry.name
+              locale = entry.name.match(/archive\/locales\/([a-z]+)?\/.*/i)
+              next if locale.nil?
+              # byebug
+              #  string.match(/\archive\/locales\/(^.*)\//i).captures
+              # puts io.read
+              save_file save_file_params.merge(language: locale[1], translations: io.read)
+            end
+          end
+
+          exit;
+
+          if(fmt[:bundle])
+            save_file(save_file_params)
+          else
+             CbxLoco.configuration.languages.each do |language|
+              save_file save_file_params.merge(language: language)
+             end
+          end
+        end
+
+        CbxLoco.configuration.emit :after_import
+
+      rescue Errno::ENOENT => e
+        print_error "Caught the exception: #{e}"
+      rescue NameError => e
+        print_error "The Extention #{i18n_file[:format]} is not correct or not supported: #{e}"
+      rescue => e
+        translations = {}
+        GetPomo::PoFile.parse(e.response).each do |t|
+          translations[t.msgid] = t.msgstr unless t.msgid.blank?
+        end
+        print_error "Download from Loco failed: #{translations["status"]}: #{translations["error"]}"
+      end
+    end
+
+    private
+
+    def save_file(extention_class:, fmt:, i18n_file:, language:, tag:, translations:)
+      if (fmt[:import_file_name].respond_to?(:call))
+        file_path = CbxLoco.file_path *(fmt[:import_file_name].call(language, fmt, i18n_file))
+      else
+        puts "\n\nERROR: import_file_name is not set into file_formats[:#{i18n_file[:format]}] \n\n"
+        exit(1)
+      end
+
+      dirname = File.dirname(file_path)
+      create_directory(dirname) unless File.directory?(dirname)
+
+      language_display = language ? " \"#{language}\"" : ""
+      puts "Importing#{language_display} #{tag}"
+      puts "path: #{file_path}"
+      print "assets... "
+      extention_class.new.export file_path: file_path, translations: translations, language: language
+      puts "Done!".colorize(:green)
+    end
+
+    def create_directory(path)
+      print "Creating \"#{path}\" folder... "
+
+      FileUtils.mkdir_p(path)
+      puts "Done!".colorize(:green)
+
+      print "Creating \".keep\" file... "
+      file_path = File.join path, ".keep"
+      FileUtils.touch(file_path)
+
+      puts "Done!".colorize(:green)
+    end
+
+    def print_error(message)
+      puts "\n\n" + message.colorize(:red).bold
+    end
+end
