@@ -6,7 +6,7 @@ require 'colorize'
 require 'get_pomo'
 require 'fileutils'
 
-class CbxLoco::Extracter
+class CbxLoco::Extractor
     def run
       puts "\n" + "Extract i18n assets".colorize(:green).bold
 

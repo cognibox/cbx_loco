@@ -1,13 +1,17 @@
 require "spec_helper"
 
 describe CbxLoco do
-  describe ".configure" do
-    let(:any_api_key) { "ANY API KEY" }
+  let(:any_api_key) { "ANY API KEY" }
 
-    before do
-      CbxLoco.configure do |c|
-        c.api_key = any_api_key
-      end
+  before do
+    CbxLoco.configure do |c|
+      c.api_key = any_api_key
+    end
+  end
+
+  describe ".configure" do
+    it "should return a configuration" do
+      expect(CbxLoco.configuration.is_a?(CbxLoco::Configuration)).to be true
     end
 
     it "should set values" do
@@ -17,20 +21,32 @@ describe CbxLoco do
 
   describe ".run" do
     context "called with import" do
-      it "should call import from LocoAdapter" do
+      let(:importer) { double }
+
+      it "should create an importer and run" do
         params = { import: true }
-        allow(CbxLoco::LocoAdapter).to receive(:import)
+        allow(CbxLoco::Importer).to receive(:new) { importer }
+        allow(importer).to receive(:run)
+
         CbxLoco.run params
-        expect(CbxLoco::LocoAdapter).to have_received(:import)
+
+        expect(CbxLoco::Importer).to have_received(:new)
+        expect(importer).to have_received(:run)
       end
     end
 
     context "called with extract" do
-      it "should call extract from LocoAdapter" do
+      let(:extractor) { double }
+
+      it "should create an extractor and run" do
         params = { extract: true }
-        allow(CbxLoco::LocoAdapter).to receive(:extract)
+        allow(CbxLoco::Extractor).to receive(:new) { extractor }
+        allow(extractor).to receive(:run)
+
         CbxLoco.run params
-        expect(CbxLoco::LocoAdapter).to have_received(:extract)
+
+        expect(CbxLoco::Extractor).to have_received(:new)
+        expect(extractor).to have_received(:run)
       end
     end
   end

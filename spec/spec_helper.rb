@@ -1,8 +1,11 @@
 require "cbx_loco"
 require "rspec"
 
-RSpec.configure do |config|
-end
+ENV["RAILS_ENV"] ||= 'test'
+require File.expand_path("../../lib/cbx_loco", __FILE__)
+
+# RSpec.configure do |config|
+# end
 
 CbxLoco.configuration.root = "."
 

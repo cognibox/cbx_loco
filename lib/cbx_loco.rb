@@ -4,7 +4,7 @@ require "cbx_loco/version"
 require 'cbx_loco/configuration'
 require 'cbx_loco/extract_adapter'
 require 'cbx_loco/importer'
-require 'cbx_loco/extracter'
+require 'cbx_loco/extractor'
 require 'cbx_loco/adapter'
 
 module CbxLoco
@@ -50,7 +50,7 @@ module CbxLoco
     return unless valid_api_key?
 
     if command[:extract]
-      Extracter.new.run
+      Extractor.new.run
     end
 
     if command[:import]
