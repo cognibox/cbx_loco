@@ -15,14 +15,16 @@ module CbxLoco
   end
 
   def self.asset_tag(*args)
+    # keep only (a-z), (,) AND (-). everything else replaced with nothing
     args.join("-").gsub(/[^a-z,-]/i, "")
   end
 
   def self.flatten_hash(data_hash, parent = [])
     data_hash.flat_map do |key, value|
-      case value
-      when Hash then flatten_hash value, parent + [key]
-      else (parent + [key]).join(".")
+      if value.is_a?(Hash)
+        flatten_hash(value, parent + [key])
+      else
+        (parent + [key]).join(".")
       end
     end
   end

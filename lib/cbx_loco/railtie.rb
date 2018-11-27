@@ -9,6 +9,6 @@ class CbxLoco::Railtie < Rails::Railtie
   end
 
   rake_tasks do
-    load File.expand_path("../tasks/i18n.rake",File.dirname(__FILE__))
+    load File.expand_path("../tasks/i18n.rake", File.dirname(__FILE__))
   end
 end
