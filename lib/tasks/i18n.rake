@@ -8,7 +8,7 @@ namespace :i18n do
   end
 
   desc "Import compiled i18n assets from Loco"
-  task :import => :environment do
+  task :import => :environment do |args|
     command = { import: true }
     CbxLoco.run command
   end

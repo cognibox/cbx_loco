@@ -25,3 +25,15 @@ end
 def fake_api_url
   "http://example.com/api/"
 end
+
+def create_file(content, path)
+  file_path = CbxLoco.file_path path
+
+  f = File.new file_path, "w:UTF-8"
+  f.write content.force_encoding("UTF-8")
+  f.close
+end
+
+def delete_file(path)
+  File.unlink CbxLoco.file_path path if File.file? path
+end

@@ -1,10 +1,18 @@
+require 'get_pomo'
+
 class CbxLoco::Extention::Gettext < CbxLoco::Extention
+  def options
+    @options ||= {
+      bundleable?: false
+    }
+  end
+
   def validate(file_path)
-    # begin
-    #   YAML.load_file(file_path)
-    # rescue Exception
-    #   puts "\n\nFILE ERROR: \"#{file_path}\" is not YAML or is invalid:\n#{$!}\n\n"
-    #   exit(1)
-    # end
+    begin
+      GetPomo::PoFile.parse(File.read(file_path))
+    rescue Exception => e
+      puts "\n\nFILE ERROR: \"#{file_path}\" is not PO or is invalid:\n#{e}\n\n"
+      exit(1)
+    end
   end
 end
