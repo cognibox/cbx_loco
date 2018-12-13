@@ -6,7 +6,6 @@ class CbxLoco::Adapter
   def self.get(api_path, params = {}, json = true)
     params = params.merge(key: CbxLoco.configuration.api_key, ts: Time.now.getutc)
     params = params.merge(v: CbxLoco.configuration.version) if CbxLoco.configuration.version
-    # p CbxLoco.configuration.api_url + api_path, params: params
     res = RestClient.get CbxLoco.configuration.api_url + api_path, params: params
 
     json ? JSON.parse(res.body) : res.body
