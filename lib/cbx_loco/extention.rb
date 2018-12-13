@@ -51,8 +51,8 @@ class CbxLoco::Extention
   end
 
   def export(file_path:, translations:)
-    file = File.new file_path, "w:UTF-8"
-    file.write translations.force_encoding("UTF-8")
+    file = File.new(file_path, "w:UTF-8")
+    file.write(translations.force_encoding("UTF-8"))
     file.close
 
     validate file_path
@@ -60,7 +60,7 @@ class CbxLoco::Extention
 
   def save_file(fmt:, i18n_file:, tag:, translations:, locale: nil)
     if (fmt[:import_file_name].respond_to?(:call))
-      file_path = CbxLoco.file_path *(fmt[:import_file_name].call(locale, fmt, i18n_file))
+      file_path = CbxLoco.file_path *(fmt[:import_file_name].call(locale: locale, fmt: fmt, i18n_file: i18n_file))
     else
       puts "\n\nERROR: import_file_name is not set into file_formats[:#{i18n_file[:format]}] \n\n"
       exit(1)

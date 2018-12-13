@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe CbxLoco::LocoAdapter do
+describe CbxLoco::ExtractAdapter do
   describe ".grab_existing_assets" do
     let(:expected_names) { ["cbx.some_other_asset", "cbx.some_asset_with_a_really_long_name_that_exceeds_locos_100_character_limit_to_asset_names_beca...", "Some other asset"] }
     context "when version is 1.0.19 or lower" do

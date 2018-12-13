@@ -36,11 +36,11 @@ class CbxLoco::Importer
       CbxLoco.configuration.emit :after_import
 
     rescue Errno::ENOENT => e
-      print_error "Caught the exception: #{e}"
+      CbxLoco::Utils.print_error "Caught the exception: #{e}"
     rescue Exceptions::NotBundleable => e
-      print_error "The file format #{extention_class.name.split('::').last} can't be bundled. Please change the bundle options to 'false'"
+      CbxLoco::Utils.print_error "The file format #{extention_class.name.split('::').last} can't be bundled. Please change the bundle options to 'false'"
     rescue => e
-      print_error "Caught the exception: #{e}"
+      CbxLoco::Utils.print_error "Caught the exception: #{e}"
     end
   end
 end
