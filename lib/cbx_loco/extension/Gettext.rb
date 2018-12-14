@@ -1,6 +1,6 @@
 require 'get_pomo'
 
-class CbxLoco::Extention::Gettext < CbxLoco::Extention
+class CbxLoco::Extension::Gettext < CbxLoco::Extension
   def options
     @options ||= {
       bundleable?: false

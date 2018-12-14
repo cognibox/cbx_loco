@@ -1,6 +1,6 @@
 require 'yaml'
 
-class CbxLoco::Extention::Yaml < CbxLoco::Extention
+class CbxLoco::Extension::Yaml < CbxLoco::Extension
   def validate(file_path)
     begin
       YAML.load_file(file_path)

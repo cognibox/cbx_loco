@@ -1,6 +1,6 @@
 require "spec_helper"
 
-class TestNotBundleableExtention < CbxLoco::Extention
+class TestNotBundleableExtension < CbxLoco::Extension
   def options
     @options ||= {
       bundleable?: false
@@ -8,14 +8,14 @@ class TestNotBundleableExtention < CbxLoco::Extention
   end
 end
 
-class TestBundleableExtention < CbxLoco::Extention
+class TestBundleableExtension < CbxLoco::Extension
   def options
     @options ||= {
     }
   end
 end
 
-describe CbxLoco::Extention do
+describe CbxLoco::Extension do
   before do
     suppress_console_output
   end
@@ -43,12 +43,12 @@ describe CbxLoco::Extention do
 
       context "when file format does not allow to be bundled" do
         it "should do stuff" do
-          expect { TestNotBundleableExtention.new.download(options) }.to raise_error(Exceptions::NotBundleable)
+          expect { TestNotBundleableExtension.new.download(options) }.to raise_error(Exceptions::NotBundleable)
         end
       end
 
       context "when file format allow to be bundled" do
-        let(:instance) { TestBundleableExtention.new }
+        let(:instance) { TestBundleableExtension.new }
 
         before do
           allow(instance).to receive(:download_from_zip)
@@ -99,7 +99,7 @@ describe CbxLoco::Extention do
       let(:options) { { fmt: { bundle: false, import_file_name: file_name_proc }, i18n_file: {}, tag: "", api_params: {} } }
       let(:zip_result) { { en: "any en", fr: "any fr" } }
       let(:file_names) { { en: "any_folder_en/file_en", fr: "any_folder_fr/file_fr" } }
-      let(:instance) { TestNotBundleableExtention.new }
+      let(:instance) { TestNotBundleableExtension.new }
 
       before do
         allow(instance).to receive(:download_from_zip)

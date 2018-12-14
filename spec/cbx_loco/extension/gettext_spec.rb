@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe CbxLoco::Extention::Gettext do
-  let(:instance) { CbxLoco::Extention::Gettext.new }
+describe CbxLoco::Extension::Gettext do
+  let(:instance) { CbxLoco::Extension::Gettext.new }
 
   describe "#validate" do
     let(:file_path) { "test.po" }

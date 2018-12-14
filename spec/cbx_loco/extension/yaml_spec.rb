@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe CbxLoco::Extention::Yaml do
-  let(:instance) { CbxLoco::Extention::Yaml.new }
+describe CbxLoco::Extension::Yaml do
+  let(:instance) { CbxLoco::Extension::Yaml.new }
 
   describe "#validate" do
     let(:file_path) { "test.yml" }

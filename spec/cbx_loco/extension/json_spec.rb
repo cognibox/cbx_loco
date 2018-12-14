@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe CbxLoco::Extention::Json do
-  let(:instance) { CbxLoco::Extention::Json.new }
+describe CbxLoco::Extension::Json do
+  let(:instance) { CbxLoco::Extension::Json.new }
 
   describe "#bundle_translations" do
     let(:content) { { en: "any", fr: "thing" } }

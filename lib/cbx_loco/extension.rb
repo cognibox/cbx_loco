@@ -1,7 +1,7 @@
 require 'cbx_loco/exceptions'
 require 'cbx_loco/utils'
 
-class CbxLoco::Extention
+class CbxLoco::Extension
    def download(fmt:, i18n_file:, tag:, api_params:)
     puts "Downloading: #{tag}"
 
@@ -36,11 +36,7 @@ class CbxLoco::Extention
     input = CbxLoco::Adapter.get "export/archive/#{api_ext}.zip", api_params, false
     Zip::InputStream.open(StringIO.new(input)) do |io|
       while entry = io.get_next_entry
-        # capture the group followed by locale/ or locales/ until anything else then letter
-        # ex: any-yml-archive/locales/en.yml
-        # match: en
-        # ex: any-json-archive/locales/en/any-en.json
-        # match: en
+        # Find the locale name in the file path
         locale = entry.name.match(/archive\/locales?\/([a-z]+).*/i)
         next if locale.nil?
         @translations[locale[1]] = io.read
@@ -62,7 +58,7 @@ class CbxLoco::Extention
     if (fmt[:import_file_name].respond_to?(:call))
       file_path = CbxLoco.file_path *(fmt[:import_file_name].call(locale: locale, fmt: fmt, i18n_file: i18n_file))
     else
-      puts "\n\nERROR: import_file_name is not set into file_formats[:#{i18n_file[:format]}] \n\n"
+      puts "\n\nERROR: import_file_name is not set in file_formats[:#{i18n_file[:format]}] \n\n"
       exit(1)
     end
 

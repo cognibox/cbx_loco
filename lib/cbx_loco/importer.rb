@@ -1,10 +1,10 @@
 require 'time'
 
 require 'cbx_loco/utils'
-require 'cbx_loco/extention'
-require 'cbx_loco/extention/yaml'
-require 'cbx_loco/extention/json'
-require 'cbx_loco/extention/gettext'
+require 'cbx_loco/extension'
+require 'cbx_loco/extension/yaml'
+require 'cbx_loco/extension/json'
+require 'cbx_loco/extension/gettext'
 
 class CbxLoco::Importer
   def run
@@ -12,8 +12,8 @@ class CbxLoco::Importer
 
     begin
       CbxLoco.configuration.i18n_files.each do |i18n_file|
-        extention_class = "CbxLoco::Extention::#{i18n_file[:format].to_s.camelize}".constantize
-        extention_instance = extention_class.new
+        extension_class = "CbxLoco::Extension::#{i18n_file[:format].to_s.camelize}".constantize
+        extension_instance = extension_class.new
 
         fmt = CbxLoco.configuration.file_formats[i18n_file[:format]]
         tag = CbxLoco.asset_tag i18n_file[:id], i18n_file[:name]
@@ -30,7 +30,7 @@ class CbxLoco::Importer
           api_params: api_params
         }
 
-        extention_instance.download(download_params)
+        extension_instance.download(download_params)
       end
 
       CbxLoco.configuration.emit :after_import
@@ -38,7 +38,7 @@ class CbxLoco::Importer
     rescue Errno::ENOENT => e
       CbxLoco::Utils.print_error "Caught the exception: #{e}"
     rescue Exceptions::NotBundleable => e
-      CbxLoco::Utils.print_error "The file format #{extention_class.name.split('::').last} can't be bundled. Please change the bundle options to 'false'"
+      CbxLoco::Utils.print_error "The file format #{extension_class.name.split('::').last} can't be bundled. Please change the bundle options to 'false'"
     rescue => e
       CbxLoco::Utils.print_error "Caught the exception: #{e}"
     end

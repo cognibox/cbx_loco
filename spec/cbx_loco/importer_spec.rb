@@ -60,9 +60,9 @@ describe CbxLoco::Importer do
     before(:each) do
       allow(CbxLoco::Adapter).to receive(:get).and_return(@str_response)
       @fake_i18n_files.each do |i18n_file|
-        extention_class = "CbxLoco::Extention::#{i18n_file[:format].to_s.camelize}".constantize
-        allow(extention_class).to receive(:new).and_return(extention_class)
-        allow(extention_class).to receive(:download)
+        extension_class = "CbxLoco::Extension::#{i18n_file[:format].to_s.camelize}".constantize
+        allow(extension_class).to receive(:new).and_return(extension_class)
+        allow(extension_class).to receive(:download)
       end
     end
 
@@ -70,10 +70,10 @@ describe CbxLoco::Importer do
       CbxLoco::Importer.new.run
 
       @fake_i18n_files.each do |i18n_file|
-        extention_class = "CbxLoco::Extention::#{i18n_file[:format].to_s.camelize}".constantize
+        extension_class = "CbxLoco::Extension::#{i18n_file[:format].to_s.camelize}".constantize
 
-        expect(extention_class).to have_received(:new)
-        expect(extention_class).to have_received(:download)
+        expect(extension_class).to have_received(:new)
+        expect(extension_class).to have_received(:download)
       end
     end
 

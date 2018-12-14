@@ -1,6 +1,6 @@
 require 'json'
 
-class CbxLoco::Extention::Json < CbxLoco::Extention
+class CbxLoco::Extension::Json < CbxLoco::Extension
   def bundle_translations
     formatted = "{ "
     @translations.each do |locale, trs|
