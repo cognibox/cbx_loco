@@ -1,14 +1,14 @@
 require 'json'
 
 class CbxLoco::Extension::Json < CbxLoco::Extension
+  protected
+
   def bundle_translations
-    formatted = "{ "
     @translations.each do |locale, trs|
       @translations[locale] = "\"#{locale}\": " + @translations[locale]
     end
 
-    formatted += @translations.values.join(", ")
-    formatted += " }"
+    formatted = "{ #{@translations.values.join(", ")} }"
     @translations = nil
 
     formatted

@@ -2,16 +2,13 @@ require "spec_helper"
 
 class TestNotBundleableExtension < CbxLoco::Extension
   def options
-    @options ||= {
-      bundleable?: false
-    }
+    @options ||= { bundleable?: false }
   end
 end
 
 class TestBundleableExtension < CbxLoco::Extension
   def options
-    @options ||= {
-    }
+    @options ||= {}
   end
 end
 
@@ -42,7 +39,7 @@ describe CbxLoco::Extension do
       let(:options) { { fmt: { bundle: true, import_file_name: file_name_proc }, i18n_file: {}, tag: "", api_params: {} } }
 
       context "when file format does not allow to be bundled" do
-        it "should do stuff" do
+        it "should raise a NotBundleable" do
           expect { TestNotBundleableExtension.new.download(options) }.to raise_error(Exceptions::NotBundleable)
         end
       end
@@ -75,7 +72,7 @@ describe CbxLoco::Extension do
           expect(file_name_proc).to have_received(:call).with(locale: nil, fmt: options[:fmt], i18n_file: options[:i18n_file])
         end
 
-        context "when folder exist" do
+        context "when folder exists" do
           it "should not create it" do
             dir = File.dirname(file_name)
             allow(File).to receive(:directory?).with(dir).and_return(true)
@@ -95,7 +92,7 @@ describe CbxLoco::Extension do
       end
     end
 
-    context "when downloading separated" do
+    context "when downloading separately" do
       let(:options) { { fmt: { bundle: false, import_file_name: file_name_proc }, i18n_file: {}, tag: "", api_params: {} } }
       let(:zip_result) { { en: "any en", fr: "any fr" } }
       let(:file_names) { { en: "any_folder_en/file_en", fr: "any_folder_fr/file_fr" } }
@@ -134,7 +131,7 @@ describe CbxLoco::Extension do
         end
       end
 
-      context "when folder exist" do
+      context "when folder exists" do
         it "should not create it" do
           dir = File.dirname(file_name)
           allow(File).to receive(:directory?).with(dir).and_return(true)

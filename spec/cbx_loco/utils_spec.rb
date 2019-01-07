@@ -13,15 +13,15 @@ describe CbxLoco::Utils do
 
     it "should create directory" do
       CbxLoco::Utils.create_directory path
-      expect(File.directory?("folder1")).to be_truthy
-      expect(File.directory?("folder1/folder2")).to be_truthy
+      expect(File.directory?("folder1")).to be true
+      expect(File.directory?("folder1/folder2")).to be true
 
       delete_path(path)
     end
 
     it "should create keep file" do
       CbxLoco::Utils.create_directory path
-      expect(File.file?(path + "/.keep")).to be_truthy
+      expect(File.file?(path + "/.keep")).to be true
 
       delete_path(path)
     end

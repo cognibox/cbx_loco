@@ -2,30 +2,24 @@ require 'cbx_loco/exceptions'
 require 'cbx_loco/utils'
 
 class CbxLoco::Extension
-   def download(fmt:, i18n_file:, tag:, api_params:)
+  def download(fmt:, i18n_file:, tag:, api_params:)
     puts "Downloading: #{tag}"
 
-    if fmt[:bundle]
-      if options[:bundleable?] == false
-        raise Exceptions::NotBundleable
-      end
-    end
+    raise Exceptions::NotBundleable if fmt[:bundle] && options[:bundleable?] == false
 
     download_from_zip(api_ext: fmt[:api_ext], api_params: api_params)
     save_translations(fmt: fmt, i18n_file: i18n_file, tag: tag)
   end
 
   def options
-    @options ||= {
-      bundleable?: true
-    }
+    @options ||= { bundleable?: true }
   end
 
   def validate(_file_path)
     # leave empty
   end
 
-  private
+  protected
 
   def bundle_translations
     @translations
@@ -38,8 +32,8 @@ class CbxLoco::Extension
       while entry = io.get_next_entry
         # Find the locale name in the file path
         locale = entry.name.match(/archive\/locales?\/([a-z]+).*/i)
-        next if locale.nil?
-        @translations[locale[1]] = io.read
+
+        @translations[locale[1]] = io.read unless locale.nil?
       end
     end
 
@@ -56,7 +50,8 @@ class CbxLoco::Extension
 
   def save_file(fmt:, i18n_file:, tag:, translations:, locale: nil)
     if (fmt[:import_file_name].respond_to?(:call))
-      file_path = CbxLoco.file_path *(fmt[:import_file_name].call(locale: locale, fmt: fmt, i18n_file: i18n_file))
+      import_file_name = fmt[:import_file_name].call(locale: locale, fmt: fmt, i18n_file: i18n_file)
+      file_path = CbxLoco.file_path(*import_file_name)
     else
       puts "\n\nERROR: import_file_name is not set in file_formats[:#{i18n_file[:format]}] \n\n"
       exit(1)
@@ -73,13 +68,13 @@ class CbxLoco::Extension
   end
 
   def save_translations(fmt:, i18n_file:, tag:)
-    options = {fmt: fmt, i18n_file: i18n_file, tag: tag}
+    options = { fmt: fmt, i18n_file: i18n_file, tag: tag }
 
     if fmt[:bundle]
-      save_file options.merge(locale: nil, translations: bundle_translations)
+      save_file(**options, locale: nil, translations: bundle_translations)
     else
       @translations.each do |locale, trs|
-        save_file options.merge(locale: locale, translations: trs)
+        save_file(**options, locale: locale, translations: trs)
       end
     end
   end

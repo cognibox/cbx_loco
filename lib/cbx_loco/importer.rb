@@ -2,9 +2,9 @@ require 'time'
 
 require 'cbx_loco/utils'
 require 'cbx_loco/extension'
-require 'cbx_loco/extension/yaml'
-require 'cbx_loco/extension/json'
 require 'cbx_loco/extension/gettext'
+require 'cbx_loco/extension/json'
+require 'cbx_loco/extension/yaml'
 
 class CbxLoco::Importer
   def run
@@ -19,9 +19,7 @@ class CbxLoco::Importer
         tag = CbxLoco.asset_tag i18n_file[:id], i18n_file[:name]
         api_params = { filter: tag, order: :id, format: fmt[:format] }
 
-        if (fmt[:import_params].is_a?(Hash))
-          api_params = api_params.merge(fmt[:import_params])
-        end
+        api_params = api_params.merge(fmt[:import_params]) if fmt[:import_params].is_a?(Hash)
 
         download_params = {
           fmt: fmt,

@@ -1,6 +1,8 @@
 require 'yaml'
 
 class CbxLoco::Extension::Yaml < CbxLoco::Extension
+  protected
+
   def validate(file_path)
     begin
       YAML.load_file(file_path)

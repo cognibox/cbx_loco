@@ -19,16 +19,16 @@ describe CbxLoco::Extension::Gettext do
     context "when invalid" do
     let(:content) { "any content" }
 
-      it "should puts error" do
-        expect{ instance.validate(CbxLoco.file_path(file_path)) }.to raise_error SystemExit
+      it "should put error" do
+        expect{ instance.send(:validate, CbxLoco.file_path(file_path)) }.to raise_error SystemExit
         expect(STDOUT).to have_received(:puts).with(/\n\nFILE ERROR: "#{CbxLoco.file_path(file_path)}" is not PO or is invalid:\n/)
       end
     end
 
     context "when valid" do
       let(:content) { "#: any comment\n msgid \"any id\"\nmsgstr \"any translation\"" }
-      it "should not puts error" do
-        expect{ instance.validate(CbxLoco.file_path(file_path)) }.to_not raise_error
+      it "should not put error" do
+        expect{ instance.send(:validate, CbxLoco.file_path(file_path)) }.to_not raise_error
         expect(STDOUT).to_not have_received(:puts).with(/\n\nFILE ERROR: "#{CbxLoco.file_path(file_path)}"is not PO or is invalid:\n/)
       end
     end

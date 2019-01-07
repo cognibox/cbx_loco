@@ -1,3 +1,4 @@
 module Exceptions
-  class NotBundleable < StandardError; end
+  class NotBundleable < StandardError
+  end
 end

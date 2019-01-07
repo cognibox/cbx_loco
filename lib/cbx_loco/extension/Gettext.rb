@@ -1,10 +1,10 @@
 require 'get_pomo'
 
 class CbxLoco::Extension::Gettext < CbxLoco::Extension
+  protected
+
   def options
-    @options ||= {
-      bundleable?: false
-    }
+    @options ||= { bundleable?: false }
   end
 
   def validate(file_path)
