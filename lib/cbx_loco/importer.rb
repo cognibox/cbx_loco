@@ -12,10 +12,12 @@ class CbxLoco::Importer
 
     begin
       CbxLoco.configuration.i18n_files.each do |i18n_file|
+        fmt = CbxLoco.configuration.file_formats[i18n_file[:format]]
+        next unless fmt[:importable]
+
         extension_class = "CbxLoco::Extension::#{i18n_file[:format].to_s.camelize}".constantize
         extension_instance = extension_class.new
 
-        fmt = CbxLoco.configuration.file_formats[i18n_file[:format]]
         tag = CbxLoco.asset_tag i18n_file[:id], i18n_file[:name]
         api_params = { filter: tag, order: :id, format: fmt[:format] }
 
