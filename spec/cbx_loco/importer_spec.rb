@@ -4,6 +4,7 @@ describe CbxLoco::Importer do
   before(:all) do
     @fake_file_formats = {
       gettext: {
+        importable: true,
         api_ext: "po",
         delete: true,
         dst_ext: "po",
@@ -11,10 +12,19 @@ describe CbxLoco::Importer do
         path: "locale"
       },
       yaml: {
+        importable: true,
         api_ext: "yml",
         delete: false,
         dst_ext: "yml",
         src_ext: "yml",
+        path: "locale"
+      },
+      json: {
+        importable: false,
+        api_ext: "json",
+        delete: false,
+        dst_ext: "json",
+        src_ext: "json",
         path: "locale"
       }
     }
@@ -29,6 +39,11 @@ describe CbxLoco::Importer do
         format: :gettext,
         id: "test_client",
         name: "test_front_end"
+      },
+      {
+        format: :json,
+        id: "test_client_not_importable",
+        name: "test_front_end"
       }
     ]
 
@@ -38,7 +53,7 @@ describe CbxLoco::Importer do
     @str_json = "{\"test\": \"#{@str_response}\"}"
   end
 
-  before(:each) do
+  before do
     @after_import_call = false
 
     CbxLoco.configure do |c|
@@ -57,7 +72,7 @@ describe CbxLoco::Importer do
   end
 
   describe "#run" do
-    before(:each) do
+    before do
       allow(CbxLoco::Adapter).to receive(:get).and_return(@str_response)
       @fake_i18n_files.each do |i18n_file|
         extension_class = "CbxLoco::Extension::#{i18n_file[:format].to_s.camelize}".constantize
@@ -72,8 +87,13 @@ describe CbxLoco::Importer do
       @fake_i18n_files.each do |i18n_file|
         extension_class = "CbxLoco::Extension::#{i18n_file[:format].to_s.camelize}".constantize
 
-        expect(extension_class).to have_received(:new)
-        expect(extension_class).to have_received(:download)
+        if @fake_file_formats[i18n_file[:format]][:importable]
+          expect(extension_class).to have_received(:new)
+          expect(extension_class).to have_received(:download)
+        else
+          expect(extension_class).to_not have_received(:new)
+          expect(extension_class).to_not have_received(:download)
+        end
       end
     end
 

@@ -52,6 +52,7 @@ describe CbxLoco::Extractor do
   before(:all) do
     @fake_file_formats = {
       gettext: {
+        extractable: true,
         api_ext: "po",
         delete: true,
         dst_ext: "po",
@@ -59,6 +60,7 @@ describe CbxLoco::Extractor do
         path: "locale"
       },
       yaml: {
+        extractable: true,
         api_ext: "yml",
         delete: false,
         dst_ext: "yml",
