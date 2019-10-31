@@ -2,13 +2,17 @@
 
 describe CbxLoco::Extractor do
   def create_files
-    @fake_i18n_files.each do |i18n_file|
+    (@fake_i18n_files || []).each do |i18n_file|
+      fmt = @fake_file_formats[i18n_file[:format]]
+      next if !fmt[:path] || !fmt[:src_ext]
+
       create_file i18n_file
     end
   end
 
   def create_file(i18n_file)
     fmt = @fake_file_formats[i18n_file[:format]]
+
     case i18n_file[:format]
     when :gettext
       file_path = CbxLoco.file_path fmt[:path], [i18n_file[:name], fmt[:src_ext]].join(".")
@@ -23,9 +27,11 @@ describe CbxLoco::Extractor do
   end
 
   def delete_files
-    @fake_i18n_files.each do |i18n_file|
+    (@fake_i18n_files || []).each do |i18n_file|
       # unlink src_ext
       fmt = @fake_file_formats[i18n_file[:format]]
+      next if !fmt[:path] || !fmt[:src_ext]
+
       case i18n_file[:format]
       when :gettext
         file_path = CbxLoco.file_path fmt[:path], [i18n_file[:name], fmt[:src_ext]].join(".")
@@ -44,12 +50,13 @@ describe CbxLoco::Extractor do
         when :yaml
           file_path = CbxLoco.file_path fmt[:path], [i18n_file[:name], language, fmt[:dst_ext]].join(".")
         end
+
         File.unlink file_path if File.file? file_path
       end
     end
   end
 
-  before(:all) do
+  before do
     @fake_file_formats = {
       gettext: {
         extractable: true,
@@ -98,9 +105,7 @@ describe CbxLoco::Extractor do
 
     @str_response = rand_str
     @str_json = "{\"test\": \"#{@str_response}\"}"
-  end
 
-  before(:each) do
     @before_extract_call = false
     @after_import_call = false
 
@@ -124,11 +129,8 @@ describe CbxLoco::Extractor do
   end
 
   describe "#run" do
-    before(:all) do
+    before do
       create_files
-    end
-
-    before(:each) do
       CbxLoco.configuration.version = "1.0.19"
 
       get_response = [
@@ -141,8 +143,57 @@ describe CbxLoco::Extractor do
       allow(File).to receive(:unlink)
     end
 
-    after(:all) do
+    after(:each) do
+      # restore mocking to be sure it delete files
+      allow(File).to receive(:unlink).and_call_original
       delete_files
+    end
+
+    context "when delete file" do
+      let(:expected_output) { /path or src_ext is not provided for name: '#{file_without_path[:name]}', id: '#{file_without_path[:id]}', format: '#{file_without_path[:format]}'/ }
+      let(:file_without_path) do
+        {
+          format: :gettext,
+          id: "test_client",
+          name: "test_front_end"
+        }
+      end
+
+      before(:each) do
+        @previous_files = @fake_i18n_files.deep_dup
+        @previous_formats = @fake_file_formats.deep_dup
+      end
+
+      after(:each) {
+        @fake_i18n_files = @previous_files
+        @fake_file_formats = @previous_formats
+      }
+
+      context "when no path" do
+        it "should output to console" do
+          @fake_file_formats[:gettext][:delete] = true
+          @fake_file_formats[:gettext][:path] = nil
+
+          @fake_i18n_files = [file_without_path]
+
+          allow(STDOUT).to receive(:puts)
+          expect { CbxLoco::Extractor.new.run }.to raise_error SystemExit
+          expect(STDOUT).to have_received(:puts).with(expected_output)
+        end
+      end
+
+      context "when no src_ext" do
+        it "should output to console" do
+          @fake_file_formats[:gettext][:delete] = true
+          @fake_file_formats[:gettext][:src_ext] = nil
+
+          @fake_i18n_files = [file_without_path]
+
+          allow(STDOUT).to receive(:puts)
+          expect { CbxLoco::Extractor.new.run }.to raise_error SystemExit
+          expect(STDOUT).to have_received(:puts).with(expected_output)
+        end
+      end
     end
 
     it "should delete old files" do
