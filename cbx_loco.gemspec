@@ -33,7 +33,7 @@ TEXT
 
   s.add_dependency "rails", ">= 4.1"
   s.add_dependency "rest-client", "~> 1.6.7"
-  s.add_dependency "rake", ">= 11.0", "<= 12.3.1"
+  s.add_dependency "rake", ">= 11.0"
 
   s.add_development_dependency "rspec", "~> 3.6"
 end
