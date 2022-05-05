@@ -1,5 +1,6 @@
 require 'cbx_loco/exceptions'
 require 'cbx_loco/utils'
+require 'zip'
 
 class CbxLoco::Extension
   def download(fmt:, i18n_file:, tag:, api_params:)
