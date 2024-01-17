@@ -37,10 +37,13 @@ class CbxLoco::Importer
 
     rescue Errno::ENOENT => e
       CbxLoco::Utils.print_error "Caught the exception: #{e}"
+      abort("Caught the exception: #{e}")
     rescue Exceptions::NotBundleable => e
       CbxLoco::Utils.print_error "The file format #{extension_class.name.split('::').last} can't be bundled. Please change the bundle options to 'false'"
+      abort("The file format #{extension_class.name.split('::').last} can't be bundled. Please change the bundle options to 'false'")
     rescue => e
       CbxLoco::Utils.print_error "Caught the exception: #{e}"
+      abort("Caught the exception: #{e}")
     end
   end
 end
