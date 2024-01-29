@@ -23,7 +23,7 @@ def fake_api_key
 end
 
 def fake_api_url
-  "http://example.com/api/"
+  "http://example.com"
 end
 
 def create_file(content, path)
