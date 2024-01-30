@@ -21,7 +21,7 @@ class CbxLoco::Adapter
 
   def self.post(api_path, params = {})
     uri = URI.parse(CbxLoco.configuration.api_url + api_path)
-    uri.query = "?key=#{CbxLoco.configuration.api_key}"
+    uri.query = "key=#{CbxLoco.configuration.api_key}"
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = (uri.scheme == 'https')

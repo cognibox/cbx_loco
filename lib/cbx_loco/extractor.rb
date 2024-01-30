@@ -1,4 +1,3 @@
-require 'rest-client'
 require 'time'
 require 'json'
 require 'yaml'
