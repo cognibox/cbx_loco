@@ -117,7 +117,7 @@ class CbxLoco::Extractor
         new_tags.each do |tag|
           print_asset_id = existing_asset[:id].length > 30 ? existing_asset[:id][0..26] + "[...]" : existing_asset[:id]
           print "Uploading tag \"#{tag}\" for asset: \"#{print_asset_id}\"... "
-          CbxLoco::Adapter.post "assets/#{URI.escape(existing_asset[:id])}/tags.json", name: tag
+          CbxLoco::Adapter.post "assets/#{CGI.escape(existing_asset[:id])}/tags.json", name: tag
           puts "Done!".colorize(:green)
         end
       end
