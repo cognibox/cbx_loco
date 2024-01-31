@@ -96,7 +96,7 @@ describe CbxLoco::Adapter do
       allow(Net::HTTP).to receive(:post).and_return(double(body: str_json))
     end
 
-    it "should call RestClient.post" do
+    it "should call Net::HTTP.post" do
       CbxLoco::Adapter.post("test")
       expect(Net::HTTP).to have_received(:post)
     end
