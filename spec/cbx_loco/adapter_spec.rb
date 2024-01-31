@@ -99,6 +99,20 @@ describe CbxLoco::Adapter do
         expect(CbxLoco::Adapter.get("test", {}, false)).to eq str_json
       end
     end
+    it 'sends the correct request and parses the response' do
+      expected_url = "#{fake_api_url}test"
+      response_body = '{"key": "value"}'
+
+      uri = URI.parse(expected_url)
+
+      http_double = double("http", request: double("request", body: response_body))
+      allow(Net::HTTP).to receive(:new).and_return(http_double)
+
+      expect(http_double).to receive(:request).with(an_instance_of(Net::HTTP::Get)) do |request_arg|
+        expect(request_arg.path).to eq(uri.path)
+        expect(request_arg.body).to eq(URI.encode_www_form(params))
+      end
+    end
   end
 
   describe "post" do
